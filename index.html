@@ -3,436 +3,538 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبارات البرمجة التنافسية</title>
+    <title>تحدي التعقيد الزمني (USACO Bronze)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; }
-        .code-snippet { direction: ltr; text-align: left; font-family: 'Courier New', Courier, monospace; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .glow-btn { box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
-        .glow-btn:hover { box-shadow: 0 0 25px rgba(37, 99, 235, 0.7); }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+            direction: ltr; /* Code always LTR */
+            text-align: left;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- الرأس (Header) -->
-    <header class="bg-gradient-to-r from-blue-800 to-indigo-900 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex flex-row justify-between items-center">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2 cursor-pointer" onclick="returnToDashboard()">
-                        <i class="fa-solid fa-laptop-code"></i>
-                       
-                    </h1>
-                </div>
-                
-                <div id="status-bar" class="hidden flex items-center gap-4 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-                    <div id="timer-container" class="hidden flex items-center gap-2 text-yellow-300 font-mono font-bold text-lg transition-colors duration-300">
-                        <i class="fa-regular fa-clock"></i>
-                        <span id="timer-display">00:00</span>
-                    </div>
-                    <div id="timer-separator" class="hidden h-4 w-px bg-white/30"></div>
-                    <div class="flex items-center gap-2 text-sm md:text-base">
-                        <i class="fa-solid fa-user"></i>
-                        <span id="user-display">زائر</span>
-                    </div>
-                </div>
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <i class="fa-solid fa-stopwatch text-indigo-600 text-xl"></i>
+                <h1 class="font-bold text-lg hidden sm:block">USACO Bronze: التعقيد الزمني</h1>
+                <h1 class="font-bold text-lg sm:hidden">التعقيد الزمني</h1>
+            </div>
+            
+            <div id="timer-container" class="hidden flex items-center bg-slate-100 px-4 py-1.5 rounded-full font-mono font-bold text-indigo-700 border border-slate-200" dir="ltr">
+                <i class="fa-regular fa-clock mr-2"></i>
+                <span id="timer">60:00</span>
             </div>
         </div>
     </header>
 
-    <!-- 1. شاشة البداية -->
-    <div id="start-screen" class="flex-grow flex items-center justify-center p-4 fade-in">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
-            <div class="mb-6 text-blue-600 text-6xl">
-                <i class="fa-solid fa-clipboard-question"></i>
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="max-w-2xl w-full glass-panel rounded-2xl shadow-xl p-8 text-center fade-in">
+            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600">
+                <i class="fa-solid fa-code text-3xl"></i>
             </div>
-            <h2 class="text-2xl font-bold mb-2 text-gray-800">منصة التدريب والاختبارات</h2>
-            <p class="text-gray-500 mb-6">الرجاء إدخال اسمك للبدء.</p>
+            <h2 class="text-3xl font-extrabold text-slate-900 mb-4">تحدي التعقيد الزمني</h2>
+            <p class="text-slate-600 mb-8 text-lg leading-relaxed">
+                اختبار عملي في Big O notation وقيود الوقت في C++.
+                <br>
+                <strong>المدة الزمنية: 60 دقيقة</strong>
+            </p>
             
-            <input type="text" id="username-input" placeholder="اكتب اسمك الكامل هنا..." 
-                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none mb-4 text-center text-lg"
-                   onkeypress="handleEnter(event)">
-            
-            <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 glow-btn">
-                تسجيل الدخول <i class="fa-solid fa-arrow-left mr-2"></i>
+            <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-xl w-full sm:w-auto transition-all transform hover:scale-105 shadow-lg shadow-indigo-200">
+                ابدأ الاختبار
             </button>
         </div>
-    </div>
 
-    <!-- 2. لوحة الاختيار (Dashboard) -->
-    <div id="dashboard-screen" class="hidden container mx-auto px-4 py-12 max-w-5xl flex-grow fade-in">
-        <div class="text-center mb-10">
-            <h2 class="text-3xl font-bold text-gray-800 mb-3">لوحة الاختبارات</h2>
-            <p class="text-gray-500">اختر اختباراً للبدء. انتبه للمدة الزمنية المحددة لكل اختبار.</p>
-        </div>
-
-        <div id="quiz-grid" class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <!-- سيتم تعبئة البطاقات هنا -->
-        </div>
-    </div>
-
-    <!-- 3. منطقة الاختبار -->
-    <main id="quiz-content" class="hidden container mx-auto px-4 py-8 max-w-4xl flex-grow">
-        <button onclick="returnToDashboard()" class="mb-4 text-gray-500 hover:text-blue-600 flex items-center gap-2 transition-colors text-sm font-bold">
-            <i class="fa-solid fa-arrow-right"></i> العودة للقائمة
-        </button>
-
-        <div id="active-quiz-container" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 fade-in">
-            <div class="border-b pb-4 mb-6 flex justify-between items-center flex-wrap gap-4">
-                <div>
-                    <h2 id="quiz-title" class="text-2xl font-bold text-blue-800">عنوان الاختبار</h2>
-                    <p class="text-gray-500 mt-1">أجب على جميع الأسئلة ثم اضغط تسليم.</p>
+        <!-- Quiz Interface -->
+        <div id="quiz-interface" class="hidden w-full max-w-3xl">
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">
+                    <span>السؤال <span id="current-q-num">1</span> من 10</span>
+                    <span id="progress-percent">0%</span>
                 </div>
-                <div class="flex gap-2">
-                    <div id="quiz-duration-badge" class="bg-yellow-50 text-yellow-700 px-4 py-2 rounded-full text-sm font-bold border border-yellow-100">
-                        <i class="fa-regular fa-clock"></i> <span id="quiz-time-text"></span>
-                    </div>
-                    <div id="quiz-q-count" class="bg-blue-50 text-blue-800 px-4 py-2 rounded-full text-sm font-bold border border-blue-100">
-                        0 أسئلة
-                    </div>
+                <div class="h-2 bg-slate-200 rounded-full overflow-hidden" dir="ltr">
+                    <div id="progress-bar" class="h-full bg-indigo-600 transition-all duration-500 ease-out" style="width: 10%"></div>
                 </div>
             </div>
-            
-            <form id="active-quiz-form" onsubmit="submitQuiz(event)">
-                <div id="quiz-questions-area" class="space-y-8"></div>
-                
-                <div class="mt-8 border-t pt-6">
-                    <div id="action-area" class="flex justify-between items-center">
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-                            <i class="fa-solid fa-paper-plane"></i>
-                            تسليم الإجابة
-                        </button>
+
+            <!-- Question Card -->
+            <div class="glass-panel rounded-2xl shadow-xl overflow-hidden fade-in">
+                <div class="p-6 sm:p-8">
+                    <div class="mb-6">
+                        <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2.5 py-0.5 rounded-full font-bold mb-3">
+                            <i class="fa-solid fa-brain ml-1"></i> تحليل
+                        </span>
+                        <h3 id="question-text" class="text-xl font-bold text-slate-800 mb-4 leading-relaxed">
+                            <!-- Question injected here -->
+                        </h3>
+                        <div id="code-snippet-container" class="hidden mb-6 bg-slate-900 rounded-lg p-4 overflow-x-auto border border-slate-700 shadow-inner text-left" dir="ltr">
+                            <pre id="code-snippet" class="code-font text-sm text-slate-300"></pre>
+                        </div>
                     </div>
-                    
-                    <div id="result-area" class="hidden mt-4 text-center bg-gray-50 p-6 rounded-xl border border-gray-200">
-                         <div id="result-text" class="text-2xl font-bold mb-4"></div>
-                         <button type="button" onclick="returnToDashboard()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition-colors shadow-md">
-                            العودة للقائمة الرئيسية
-                         </button>
+
+                    <div id="options-container" class="space-y-3">
+                        <!-- Options injected here -->
                     </div>
                 </div>
-            </form>
+                
+                <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-between items-center">
+                    <button id="prev-btn" onclick="prevQuestion()" class="text-slate-500 hover:text-slate-800 font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-30" disabled>
+                        <i class="fa-solid fa-arrow-right ml-2"></i>السابق
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-6 py-2 rounded-lg transition-colors shadow-md">
+                        التالي <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </button>
+                    <button id="submit-btn" onclick="submitQuiz()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-lg transition-colors shadow-md shadow-indigo-200">
+                        إنهاء وتسليم
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden w-full max-w-4xl fade-in">
+            <div class="glass-panel rounded-2xl shadow-xl p-8 mb-8 text-center border-t-8 border-indigo-600">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">اكتمل الاختبار</h2>
+                <div class="flex items-center justify-center my-6">
+                    <div class="relative">
+                        <svg class="w-32 h-32 transform -rotate-90">
+                            <circle cx="64" cy="64" r="56" stroke="#e2e8f0" stroke-width="12" fill="none"></circle>
+                            <circle id="score-ring" cx="64" cy="64" r="56" stroke="#4f46e5" stroke-width="12" fill="none" stroke-dasharray="351.86" stroke-dashoffset="351.86" class="transition-all duration-1000 ease-out"></circle>
+                        </svg>
+                        <div class="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
+                            <span id="score-display" class="text-4xl font-extrabold text-slate-900">0</span>
+                            <span class="text-xs text-slate-500 font-bold uppercase">/ 10</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Removed motivational text -->
+                <div class="flex justify-center gap-4">
+                    <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                        إعادة الاختبار
+                    </button>
+                    <button onclick="document.getElementById('review-section').scrollIntoView({behavior: 'smooth'})" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-6 rounded-lg transition-colors">
+                        مراجعة الإجابات
+                    </button>
+                </div>
+            </div>
+
+            <div id="review-section" class="space-y-6">
+                <h3 class="text-xl font-bold text-slate-800 ml-2">تفاصيل الإجابات</h3>
+                <!-- Review cards injected here -->
+            </div>
+        </div>
+
     </main>
 
-    <!-- تذييل الصفحة -->
-    <footer class="text-center py-6 text-gray-500 text-sm mt-auto border-t border-gray-200 bg-white">
-        <p>Developed by Yazan Ali &copy; 2025</p>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-8">
+        <div class="max-w-4xl mx-auto px-4 text-center text-slate-400 text-sm">
+            <p>USACO Guide Practice</p>
+        </div>
     </footer>
 
     <script>
-        // إعدادات Telegram
-        const TELEGRAM_BOT_TOKEN = "8409840849:AAGJwvP3n7MulSoBEiGJxh_8preiWeXIOgI"; 
-        const TELEGRAM_CHAT_ID = "6033677437"; 
-
-        let currentUser = "";
-        let timerInterval;
-        let timeRemaining = 0;
-        let quizActive = false;
-        let currentQuizId = null;
-
-        // === البيانات الافتراضية ===
-        const defaultQuizzes = {
-            'placement': {
-                id: 'placement',
-                title: 'تحديد مستوى (Placement Test)',
-                desc: 'اختبار شامل لأساسيات لغة C++ (40 سؤال)',
-                icon: 'fa-graduation-cap',
-                color: 'emerald',
-                duration: 45, // 45 دقيقة
-                questions: [
-                    // --- Basics & Variables ---
-                    { id: 1, question: "ما هو ناتج عملية القسمة الصحيحة التالية؟", code: "int x = 5;\nint y = 2;\ncout << x / y;", options: ["2.5", "2", "3", "Error"], correct: 1 },
-                    { id: 2, question: "ما هو نوع المتغير المناسب لتخزين النصوص؟", code: "Example: \"Hello World\"", options: ["char", "String", "std::string", "text"], correct: 2 },
-                    { id: 3, question: "ما هي الصيغة الصحيحة لتعريف الدالة الرئيسية؟", code: "___ main() { ... }", options: ["void", "int", "float", "program"], correct: 1 },
-                    { id: 4, question: "ما هو الحجم القياسي للمتغير الصحيح (Integer)؟", code: "int x;", options: ["1 byte", "2 bytes", "4 bytes", "8 bytes"], correct: 2 },
-                    { id: 5, question: "ما هو ناتج عملية باقي القسمة (Modulus)؟", code: "cout << 10 % 3;", options: ["3", "1", "0", "3.33"], correct: 1 },
-                    { id: 6, question: "ما هي الرموز المستخدمة لكتابة تعليق من سطر واحد؟", code: "code...  comment", options: ["/* ... */", "# ...", "// ...", "<!-- ... -->"], correct: 2 },
-                    { id: 7, question: "ما هو الرمز الذي يجب أن ينتهي به كل سطر برمجي؟", code: "int x = 5 _", options: ["النقطة (.)", "النقطتين (:)", "الفاصلة المنقوطة (;)", "الفاصلة (,)"], correct: 2 },
-                    { id: 8, question: "أي من الأسماء التالية يعتبر صالحاً لتسمية متغير؟", code: null, options: ["1variable", "_variable", "var-iable", "int"], correct: 1 },
-                    
-                    // --- Loops ---
-                    { id: 9, question: "كم مرة سيتم طباعة قيمة i في الحلقة التالية؟", code: "for(int i=0; i<10; i+=2) {\n  cout << i;\n}", options: ["10 مرات", "5 مرات", "9 مرات", "4 مرات"], correct: 1 },
-                    { id: 10, question: "ماذا يحدث إذا كان شرط الحلقة خاطئاً (false) منذ البداية؟", code: "while(false) { ... }", options: ["تتنفذ مرة واحدة", "لا تتنفذ أبداً", "تتنفذ إلى ما لا نهاية", "خطأ برمجي"], correct: 1 },
-                    { id: 11, question: "ما هي الميزة الأساسية لحلقة do-while؟", code: "do { ... } while(condition);", options: ["تتنفذ 0 مرة على الأقل", "تتنفذ مرة واحدة على الأقل", "تعمل للأبد", "أسرع في التنفيذ"], correct: 1 },
-                    { id: 12, question: "لإيقاف الحلقة والخروج منها فوراً نستخدم:", code: null, options: ["stop", "return", "break", "continue"], correct: 2 },
-                    { id: 13, question: "لتجاوز الدورة الحالية والانتقال للدورة التالية نستخدم:", code: null, options: ["skip", "break", "continue", "next"], correct: 2 },
-                    { id: 14, question: "ما هو ناتج الكود التالي؟", code: "int i = 0;\nwhile(i < 3) {\n    cout << i;\n    i++;\n}", options: ["012", "123", "0123", "infinite loop"], correct: 0 },
-                    { id: 15, question: "نوع الحلقة الأنسب عندما نعرف عدد التكرارات مسبقاً:", code: null, options: ["while", "do-while", "for", "if"], correct: 2 },
-                    { id: 16, question: "ماذا يحدث إذا نسينا زيادة العداد داخل حلقة while؟", code: "while(i < 10) { cout << i; }", options: ["Syntax Error", "Infinite Loop (حلقة لا نهائية)", "لا شيء", "Runtime Error"], correct: 1 },
-
-                    // --- Conditions ---
-                    { id: 17, question: "أي مما يلي يعتبر كتابة صحيحة (Syntax) لجملة شرطية if؟", code: null, options: ["if x = 5 then", "if (x == 5)", "check x == 5", "if {x == 5}"], correct: 1 },
-                    { id: 18, question: "ما وظيفة الرمز == ؟", code: "if (x == y)", options: ["إسناد قيمة للمتغير", "مقارنة المساواة", "لا يساوي", "تعليق"], correct: 1 },
-                    { id: 19, question: "ما وظيفة الرمز != ؟", code: "if (x != y)", options: ["تساوي", "لا تساوي", "أكبر أو يساوي", "نفي"], correct: 1 },
-                    { id: 20, question: "ما ناتج الشرط المنطقي التالي؟", code: "(5 > 3 && 2 < 4)", options: ["True", "False", "Error", "10"], correct: 0 },
-                    { id: 21, question: "ما ناتج الشرط المنطقي التالي؟", code: "(5 > 10 || 2 < 4)", options: ["True", "False", "Error", "Null"], correct: 0 },
-                    { id: 22, question: "متى يتم تنفيذ الكود داخل الجملة الشرطية التالية؟", code: "if (x > 5) { ... }", options: ["عندما x تساوي 5", "عندما x أقل من 5", "عندما x أكبر من 5", "دائماً"], correct: 2 },
-                    { id: 23, question: "ما هي نتيجة المعامل المنطقي ! (Not)؟", code: "!true", options: ["True", "False", "Error", "Null"], correct: 1 },
-                    { id: 24, question: "أي مما يلي يمثل المعامل الثلاثي (Ternary Operator)؟", code: null, options: ["condition ? true : false", "condition : true ? false", "if condition ? true", "condition -> true"], correct: 0 },
-
-                    // --- Arrays & Strings ---
-                    { id: 25, question: "كيف نصل للعنصر الأول في المصفوفة؟", code: "int arr[5];", options: ["arr[0]", "arr[1]", "arr.first()", "arr(0)"], correct: 0 },
-                    { id: 26, question: "ما هو آخر فهرس (Index) صالح في المصفوفة التالية؟", code: "int arr[5];", options: ["5", "4", "6", "0"], correct: 1 },
-                    { id: 27, question: "ماذا يحدث عند محاولة الوصول لعنصر خارج حدود المصفوفة؟", code: "int arr[5];\ncout << arr[10];", options: ["توسيع المصفوفة تلقائياً", "يعود للبداية", "Undefined Behavior (خطأ)", "يعيد 0"], correct: 2 },
-                    { id: 28, question: "الطريقة الصحيحة لتعريف مصفوفة تحتوي 3 أعداد:", code: null, options: ["int arr(3);", "arr{3} int;", "int arr[3];", "array int 3;"], correct: 2 },
-                    { id: 29, question: "ما هو ناتج جمع حرف مع رقم؟", code: "char c = 'A'; // ASCII 65\ncout << c + 1;", options: ["AB", "66 (قيمة الحرف B)", "Error", "A1"], correct: 1 },
-                    { id: 30, question: "إذا كان لدينا نص string s=\"Hello\"، ما هو فهرس الحرف 'o'؟", code: null, options: ["3", "4", "5", "0"], correct: 1 },
-                    { id: 31, question: "لمعرفة عدد أحرف النص المخزن في المتغير s:", code: "string s = \"Hello\";", options: ["s.length()", "len(s)", "s.size", "s.count()"], correct: 0 },
-                    { id: 32, question: "كيف نقوم بدمج نصين s1 و s2؟", code: "string s1, s2;", options: ["s1 . s2", "s1 + s2", "add(s1, s2)", "s1 & s2"], correct: 1 },
-
-                    // --- Functions & Misc ---
-                    { id: 33, question: "إذا كانت الدالة لا تعيد أي قيمة، يكون نوعها:", code: "___ myFunction()", options: ["int", "null", "void", "empty"], correct: 2 },
-                    { id: 34, question: "ماذا يعني الأمر return 0 في نهاية main؟", code: null, options: ["البرنامج انتهى بنجاح", "إعادة تشغيل البرنامج", "طباعة 0", "حدث خطأ"], correct: 0 },
-                    { id: 35, question: "ما هي وظيفة الأمر endl؟", code: "cout << \"Hello\" << endl;", options: ["طباعة سطر جديد", "إنهاء البرنامج", "مسح الشاشة", "إيقاف مؤقت"], correct: 0 },
-                    { id: 36, question: "ما هي قيمة المتغير x في الكود التالي؟", code: "int main() {\n  int x;\n  cout << x;\n}", options: ["0", "1", "قيمة عشوائية (Garbage)", "null"], correct: 2 },
-                    { id: 37, question: "ما هو الكائن المستخدم لاستقبال المدخلات؟", code: "___ >> variable;", options: ["cin", "cout", "return", "for"], correct: 0 },
-                    { id: 38, question: "ما هو ناتج الكود التالي؟ (Post-increment)", code: "int x=5; \ncout << x++;", options: ["5", "6", "Error", "4"], correct: 0 },
-                    { id: 39, question: "ما هو ناتج الكود التالي؟ (Pre-increment)", code: "int x=5; \ncout << ++x;", options: ["5", "6", "Error", "4"], correct: 1 },
-                    { id: 40, question: "ما هو ناتج العملية الحسابية: 3 + 2 * 4 ؟", code: "(الأولوية للضرب)", options: ["20", "11", "9", "24"], correct: 1 }
-                ]
+        // --- Quiz Data ---
+        const questions = [
+            {
+                id: 1,
+                text: "ما هو التعقيد الزمني في أسوأ حالة (Worst-case) للكود التالي؟",
+                code: `for (int i = 0; i < n; i++) {
+    for (int j = 0; j < i; j++) {
+        cout << i << " " << j << endl;
+    }
+}`,
+                options: [
+                    "O(N)",
+                    "O(N log N)",
+                    "O(N²)",
+                    "O(N³)"
+                ],
+                correct: 2, // Index 2 -> O(N²)
+                explanation: "الحلقة الخارجية تعمل N مرة. الحلقة الداخلية تعمل 'i' مرة. إجمالي التكرارات هو 0 + 1 + 2 + ... + (N-1)، وهو مجموع أول N أرقام صحيحة. المجموع يساوي N(N-1)/2، والذي يبسط إلى O(N²)."
             },
-            'complexity': {
-                id: 'complexity',
-                title: 'التعقيد الزمني',
-                desc: 'Time Complexity & Big O (10 أسئلة)',
-                icon: 'fa-clock',
-                color: 'blue',
-                duration: 15,
-                questions: [
-                    { id: 1, question: "ما هو التعقيد الزمني (Time Complexity) للكود التالي؟", code: `for (int i = 0; i < N; i++) { cout << i << endl; }`, options: ["O(1)", "O(N)", "O(N^2)", "O(log N)"], correct: 1 },
-                    { id: 2, question: "في لغة C++، كم عملية تقريباً يمكن للكمبيوتر تنفيذها في الثانية الواحدة؟", code: null, options: ["100 عملية", "1,000,000 (مليون)", "100,000,000 (100 مليون)", "10,000,000,000 (10 مليار)"], correct: 2 },
-                    { id: 3, question: "ما هو التعقيد الزمني للحلقتين المتداخلتين التاليتين؟", code: `for (int i = 0; i < N; i++) { for (int j = 0; j < N; j++) { /* Op */ } }`, options: ["O(N)", "O(N^2)", "O(N log N)", "O(2^N)"], correct: 1 },
-                    { id: 4, question: "إذا كانت قيمة N تساوي 100,000. هل الحل بـ O(N^2) مقبول؟", code: null, options: ["نعم، دائماً", "لا، سيستغرق وقتاً طويلاً جداً (TLE)", "نعم، إذا كانت الذاكرة كافية", "لا، لأن الكود لن يعمل"], correct: 1 },
-                    { id: 5, question: "الوصول لعنصر في مصفوفة باستخدام المؤشر (Index) مثل `arr[5]` يعتبر عملية:", code: null, options: ["O(1) - وقت ثابت", "O(N) - وقت خطي", "O(log N) - وقت لوغاريتمي", "يعتمد على حجم المصفوفة"], correct: 0 },
-                    { id: 6, question: "ما هو التعقيد الزمني للكود التالي (قسمة N على 2 في كل خطوة)؟", code: `while (N > 0) { N = N / 2; }`, options: ["O(N)", "O(N^2)", "O(log N)", "O(1)"], correct: 2 },
-                    { id: 7, question: "في Big O Notation، ماذا نفعل بالثوابت؟ (مثلاً إذا كان الكود يأخذ 2N عملية)", code: null, options: ["نحتفظ بها فتصبح O(2N)", "نتجاهلها فتصبح O(N)", "نحولها لأس فتصبح O(N^2)", "تعتمد على قيمة N"], correct: 1 },
-                    { id: 8, question: "ما هو التعقيد الزمني لهذا الكود؟ (لاحظ الحلقة الداخلية تعتمد على i)", code: `for (int i = 0; i < N; i++) { for (int j = 0; j < i; j++) { /* Op */ } }`, options: ["O(N)", "O(N log N)", "O(N^2)", "O(1)"], correct: 2 },
-                    { id: 9, question: "أي من التعقيدات التالية يعتبر 'الأسرع' والأفضل عند زيادة حجم البيانات N بشكل كبير؟", code: null, options: ["O(N!)", "O(N^2)", "O(N)", "O(log N)"], correct: 3 },
-                    { id: 10, question: "عادةً، ماذا يمثل الـ Big O Notation؟", code: null, options: ["أفضل حالة (Best Case)", "أسوأ حالة (Worst Case - Upper Bound)", "متوسط الحالة (Average Case)", "الوقت المحدد بالثواني"], correct: 1 }
-                ]
+            {
+                id: 2,
+                text: "إذا كانت N ≤ 10⁵، أي من التعقيدات الزمنية التالية من المرجح أن يتجاوز حد الوقت البالغ ثانية واحدة (حوالي 10⁸ عملية)؟",
+                code: null,
+                options: [
+                    "O(N)",
+                    "O(N log N)",
+                    "O(N√N)",
+                    "O(N²)"
+                ],
+                correct: 3, // Index 3 -> O(N²)
+                explanation: "إذا كانت N = 10⁵، فإن N² = (10⁵)² = 10¹⁰. هذا الرقم أكبر بكثير من حد الـ 10⁸ عملية في الثانية. بينما O(N√N) يساوي تقريباً 3x10⁷، وهو ضمن الحد المقبول."
+            },
+            {
+                id: 3,
+                text: "حدد تعقيد بنية الحلقة التالية حيث يزداد متغير الحلقة الداخلية بالضرب.",
+                code: `for (int i = 0; i < n; i++) {
+    for (int j = 1; j < n; j *= 2) {
+        // constant time operation
+    }
+}`,
+                options: [
+                    "O(N)",
+                    "O(N²)",
+                    "O(N log N)",
+                    "O(log N)"
+                ],
+                correct: 2, // Index 2 -> O(N log N)
+                explanation: "الحلقة الخارجية تعمل N مرة. الحلقة الداخلية تبدأ من 1 وتضرب j في 2 حتى تصل إلى N. عدد الخطوات للوصول إلى N بالمضاعفة هو log₂(N). لذلك، التعقيد الكلي هو N * log N = O(N log N)."
+            },
+            {
+                id: 4,
+                text: "ما هو تعقيد هذه الدالة التكرارية (Recursive)؟",
+                code: `int func(int n) {
+    if (n <= 1) return 1;
+    return func(n - 1) + func(n - 1);
+}`,
+                options: [
+                    "O(N)",
+                    "O(N²)",
+                    "O(2ᴺ)",
+                    "O(N!)"
+                ],
+                correct: 2, // Index 2 -> O(2^N)
+                explanation: "كل استدعاء ينشئ استدعاءين تكراريين جديدين. هذا يخلق شجرة ثنائية من الاستدعاءات بعمق N. العدد الإجمالي للعقد في شجرة ثنائية كاملة بعمق N هو 2ᴺ - 1. إذن التعقيد هو O(2ᴺ)."
+            },
+            {
+                id: 5,
+                text: "ما هو تعقيد الكود التالي الذي يتضمن جذوراً تربيعية؟",
+                code: `for (int i = 1; i * i <= n; i++) {
+    if (n % i == 0) {
+        cout << i << endl;
+    }
+}`,
+                options: [
+                    "O(N)",
+                    "O(log N)",
+                    "O(√N)",
+                    "O(N/2)"
+                ],
+                correct: 2, // Index 2 -> O(√N)
+                explanation: "شرط الحلقة هو `i * i <= n`، وهو يكافئ `i <= √n`. الحلقة تعمل من 1 حتى √n، مما يجعل التعقيد O(√N)."
+            },
+            {
+                id: 6,
+                text: "حلل تعقيد بنية الحلقة المشابهة لـ 'Harmonic Series':",
+                code: `for (int i = 1; i <= n; i++) {
+    for (int j = i; j <= n; j += i) {
+        // constant time operation
+    }
+}`,
+                options: [
+                    "O(N)",
+                    "O(N²)",
+                    "O(N√N)",
+                    "O(N log N)"
+                ],
+                correct: 3, // Index 3 -> O(N log N)
+                explanation: "عندما i=1، الحلقة الداخلية تعمل N مرة. عندما i=2، تعمل N/2 مرة. المجموع هو N/1 + N/2 + ... + N/N. بإخراج N كعامل مشترك، نحصل على متسلسلة توافقية مجموعها تقريباً ln(N). إذن O(N log N)."
+            },
+            {
+                id: 7,
+                text: "أي عملية قياسية في C++ STL لها تعقيد زمني في أسوأ حالة O(N) بدلاً من O(1) أو O(log N)؟",
+                code: null,
+                options: [
+                    "vector::push_back",
+                    "map::insert",
+                    "vector::insert (في البداية)",
+                    "stack::pop"
+                ],
+                correct: 2, // Index 2
+                explanation: "الإضافة في بداية الـ vector تتطلب إزاحة جميع العناصر N الموجودة خطوة واحدة لليمين لتوفير مساحة، مما ينتج عنه تعقيد O(N). بينما `push_back` هي O(1) تقريباً (amortized)، و `map::insert` هي O(log N)."
+            },
+            {
+                id: 8,
+                text: "ما هو التعقيد الزمني لخوارزمية الترتيب القياسية `std::sort` في C++ (بناءً على C++11 والأحدث)؟",
+                code: `vector<int> v = {5, 1, 4, 2, 8};\nsort(v.begin(), v.end());`,
+                options: [
+                    "O(N)",
+                    "O(N log N)",
+                    "O(N²)",
+                    "O(N!)"
+                ],
+                correct: 1, // Index 1 -> O(N log N)
+                explanation: "تضمن دالة `std::sort` في C++ القياسية تعقيد زمني قدره O(N log N) في أسوأ الحالات (عادة ما يتم تنفيذها باستخدام IntroSort وهو مزيج من QuickSort و HeapSort و InsertionSort)."
+            },
+            {
+                id: 9,
+                text: "تأمل الحلقة المتداخلة التالية. لاحظ عدم إعادة تعيين المتغير الداخلي j.",
+                code: `// نفترض وجود مصفوفة مرتبة
+vector<int> arr(n); 
+int j = 0;
+for(int i = 0; i < n; i++) {
+    while(j < n && arr[j] < arr[i]) {
+        j++;
+    }
+}`,
+                options: [
+                    "O(N)",
+                    "O(N²)",
+                    "O(N log N)",
+                    "O(N√N)"
+                ],
+                correct: 0, // Index 0 -> O(N)
+                explanation: "على الرغم من وجود حلقة while داخل حلقة for، إلا أن المتغير `j` لا يتم تصفيره (إعادته للصفر) في كل تكرار لـ `i`. المتغير `j` يزداد فقط من 0 إلى N عبر *كامل* تنفيذ الكود. إجمالي العمليات لـ i و j هو 2N كحد أقصى، مما يعني O(N)."
+            },
+            {
+                id: 10,
+                text: "إذا كانت الخوارزمية ذات تعقيد O(N!) والوقت المسموح ثانية واحدة، فما هي قيمة N التقريبية القصوى التي يمكن حلها؟",
+                code: null,
+                options: [
+                    "N ≈ 10-11",
+                    "N ≈ 20-25",
+                    "N ≈ 100",
+                    "N ≈ 1000"
+                ],
+                correct: 0, // Index 0
+                explanation: "قيمة 10! تساوي 3,628,800. وقيمة 11! تساوي حوالي 39 مليون. أما 12! فتساوي 479 مليون (تتجاوز 10⁸). لذلك N تكون تقريباً 10 أو 11."
             }
-        };
+        ];
 
-        let quizDatabase = {};
+        // --- State ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let timeLeft = 60 * 60; // 60 minutes in seconds
+        let timerInterval;
 
-        function initApp() {
-            // نقوم دائماً بتحميل الاختبارات الافتراضية الجديدة لضمان التحديث
-            quizDatabase = JSON.parse(JSON.stringify(defaultQuizzes));
-            renderDashboard();
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const quizInterface = document.getElementById('quiz-interface');
+        const resultsScreen = document.getElementById('results-screen');
+        const questionText = document.getElementById('question-text');
+        const codeSnippetContainer = document.getElementById('code-snippet-container');
+        const codeSnippet = document.getElementById('code-snippet');
+        const optionsContainer = document.getElementById('options-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const currentQNum = document.getElementById('current-q-num');
+        const timerDisplay = document.getElementById('timer');
+        const timerContainer = document.getElementById('timer-container');
+
+        // --- Functions ---
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizInterface.classList.remove('hidden');
+            quizInterface.classList.add('flex', 'flex-col', 'items-center'); // Ensure flex behavior
+            timerContainer.classList.remove('hidden');
+            
+            loadQuestion(0);
+            startTimer();
         }
 
-        function saveData() {
-            // localStorage.setItem('usaco_quizzes', JSON.stringify(quizDatabase));
-        }
-
-        // --- وظائف المستخدم ---
-
-        function handleEnter(e) { if(e.key === 'Enter') handleLogin(); }
-
-        function handleLogin() {
-            const name = document.getElementById('username-input').value.trim();
-            if (name === "") { alert("الرجاء كتابة اسمك للمتابعة!"); return; }
-            currentUser = name;
-            document.getElementById('user-display').textContent = currentUser;
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('status-bar').classList.remove('hidden');
-            document.getElementById('dashboard-screen').classList.remove('hidden');
-            renderDashboard();
-        }
-
-        function renderDashboard() {
-            const grid = document.getElementById('quiz-grid');
-            grid.innerHTML = '';
-            
-            Object.values(quizDatabase).forEach(quiz => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 card-hover transition-all duration-300 flex flex-col';
-                // دعم الألوان المختلفة
-                const colorClass = quiz.color === 'emerald' ? 'bg-emerald-600 text-white' : 
-                                   (quiz.color === 'indigo' ? 'bg-indigo-600 text-white' : 
-                                   (quiz.color === 'purple' ? 'bg-purple-600 text-white' : 'bg-blue-600 text-white'));
-                
-                const lightText = quiz.color === 'emerald' ? 'text-emerald-100' : 'text-blue-100';
-
-                card.innerHTML = `
-                    <div class="${colorClass} p-6 text-center relative overflow-hidden">
-                        <i class="fa-solid ${quiz.icon || 'fa-question'} text-5xl mb-3 opacity-90 relative z-10"></i>
-                        <h3 class="text-xl font-bold relative z-10">${quiz.title}</h3>
-                        <p class="${lightText} text-sm mb-3 relative z-10">${quiz.desc}</p>
-                        
-                        <div class="inline-block bg-black/20 rounded-full px-3 py-1 text-xs font-bold backdrop-blur-sm relative z-10">
-                            <i class="fa-regular fa-clock"></i> ${quiz.duration || 15} دقيقة
-                        </div>
-                    </div>
-                    <div class="p-6 flex-grow flex flex-col justify-end">
-                        <div class="text-center mb-4 text-sm font-bold text-gray-400">
-                             ${quiz.questions.length} أسئلة
-                        </div>
-                        <button onclick="startTest('${quiz.id}')" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            بدء الاختبار <i class="fa-solid fa-play text-xs"></i>
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function startTest(id) {
-            currentQuizId = id;
-            const quiz = quizDatabase[id];
-            
-            document.getElementById('dashboard-screen').classList.add('hidden');
-            document.getElementById('quiz-content').classList.remove('hidden');
-            document.getElementById('timer-container').classList.remove('hidden');
-            document.getElementById('timer-separator').classList.remove('hidden');
-            
-            // تهيئة واجهة الاختبار
-            document.getElementById('quiz-title').textContent = quiz.title;
-            document.getElementById('quiz-q-count').textContent = quiz.questions.length + " أسئلة";
-            const duration = quiz.duration || 15;
-            document.getElementById('quiz-time-text').textContent = duration + " دقيقة";
-
-            document.getElementById('action-area').classList.remove('hidden');
-            document.getElementById('result-area').classList.add('hidden');
-            
-            renderQuizQuestions(quiz.questions);
-            startTimer(duration);
-        }
-
-        function renderQuizQuestions(questions) {
-            const container = document.getElementById('quiz-questions-area');
-            container.innerHTML = questions.map((q, index) => `
-                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors duration-200" id="q-${index}">
-                    <p class="font-bold text-lg mb-3 flex items-start gap-2">
-                        <span class="text-white bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center text-sm flex-shrink-0 mt-1">${index + 1}</span>
-                        <span class="mt-1">${q.question}</span>
-                    </p>
-                    ${q.code ? `<pre class="code-snippet bg-gray-900 text-green-400 p-4 rounded-lg mb-4 text-sm overflow-x-auto shadow-inner border border-gray-700 font-mono leading-relaxed" dir="ltr">${q.code}</pre>` : ''}
-                    <div class="space-y-3 mr-10">
-                        ${q.options.map((opt, optIndex) => `
-                            <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 group">
-                                <input type="radio" name="q-${index}" value="${optIndex}" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <span class="mr-3 text-gray-700 group-hover:text-blue-800">${opt}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                    <div class="feedback hidden mt-4 mr-10 p-4 rounded-lg text-sm font-bold flex items-center gap-2"></div>
-                </div>
-            `).join('');
-        }
-
-        function startTimer(minutes) {
-            timeRemaining = minutes * 60;
-            quizActive = true;
-            const display = document.getElementById('timer-display');
-            const container = document.getElementById('timer-container');
-            
-            container.className = 'flex items-center gap-2 text-yellow-300 font-mono font-bold text-lg transition-colors duration-300';
-            
-            if (timerInterval) clearInterval(timerInterval);
-            
+        function startTimer() {
             timerInterval = setInterval(() => {
-                if (!quizActive) { clearInterval(timerInterval); return; }
+                timeLeft--;
                 
-                let m = Math.floor(timeRemaining / 60);
-                let s = timeRemaining % 60;
-                display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-                
-                if (timeRemaining < 60) {
-                    container.classList.remove('text-yellow-300');
-                    container.classList.add('text-red-400', 'animate-pulse');
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (timeLeft <= 60) {
+                    timerDisplay.parentElement.classList.remove('bg-slate-100', 'text-indigo-700');
+                    timerDisplay.parentElement.classList.add('bg-red-100', 'text-red-700', 'animate-pulse');
                 }
-                
-                if (--timeRemaining < 0) {
+
+                if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    alert("انتهى الوقت!");
-                    submitQuiz(new Event('submit'));
+                    submitQuiz();
                 }
             }, 1000);
         }
 
-        async function submitQuiz(event) {
-            event?.preventDefault();
-            if (!quizActive && timeRemaining > 0 && event) return; 
+        function loadQuestion(index) {
+            currentQuestion = index;
+            const q = questions[index];
 
-            clearInterval(timerInterval);
-            quizActive = false;
-            document.getElementById('timer-container').classList.remove('text-yellow-300', 'animate-pulse', 'text-red-400');
-            document.getElementById('timer-container').classList.add('text-gray-400');
+            // Update Text
+            questionText.textContent = `${index + 1}. ${q.text}`;
+            currentQNum.textContent = index + 1;
 
-            const quiz = quizDatabase[currentQuizId];
-            let score = 0;
-            
-            quiz.questions.forEach((q, index) => {
-                const selected = document.querySelector(`input[name="q-${index}"]:checked`);
-                const div = document.getElementById(`q-${index}`);
-                const feedback = div.querySelector('.feedback');
+            // Update Code Snippet
+            if (q.code) {
+                codeSnippetContainer.classList.remove('hidden');
+                codeSnippet.textContent = q.code;
+            } else {
+                codeSnippetContainer.classList.add('hidden');
+            }
+
+            // Generate Options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-right p-4 rounded-xl border-2 transition-all ${
+                    userAnswers[index] === i 
+                    ? 'border-indigo-600 bg-indigo-50 text-indigo-900 font-semibold shadow-sm' 
+                    : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-700'
+                }`;
+                // Icons logic flipped for RTL visually if needed, but flex handles order
+                btn.innerHTML = `<div class="flex items-center"><span class="w-6 h-6 rounded-full border-2 flex items-center justify-center ml-3 text-xs ${userAnswers[index] === i ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300 text-transparent'}"><i class="fa-solid fa-check"></i></span>${opt}</div>`;
                 
-                div.querySelectorAll('input').forEach(i => i.disabled = true);
-                
-                feedback.classList.remove('hidden');
-                if (selected && parseInt(selected.value) === q.correct) {
-                    score++;
-                    feedback.className = 'feedback mt-4 mr-10 p-4 rounded-lg text-sm font-bold flex items-center gap-2 bg-green-100 text-green-800 border border-green-200';
-                    feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> إجابة صحيحة!';
-                    div.classList.add('border-green-500', 'bg-green-50');
-                } else {
-                    feedback.className = 'feedback mt-4 mr-10 p-4 rounded-lg text-sm font-bold flex items-center gap-2 bg-red-100 text-red-800 border border-red-200';
-                    feedback.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> خطأ. الإجابة: ${q.options[q.correct]}`;
-                    div.classList.add('border-red-500', 'bg-red-50');
-                }
+                btn.onclick = () => selectAnswer(i);
+                optionsContainer.appendChild(btn);
             });
 
-            document.getElementById('action-area').classList.add('hidden');
-            document.getElementById('result-area').classList.remove('hidden');
-            
-            // حساب النسبة
-            const percentage = Math.round((score / quiz.questions.length) * 100);
-            let msg = "";
-            let color = "";
-            if(percentage >= 90) { msg = "مستوى ممتاز! 🌟"; color = "text-green-600"; }
-            else if(percentage >= 70) { msg = "مستوى جيد جداً 👍"; color = "text-blue-600"; }
-            else if(percentage >= 50) { msg = "مستوى متوسط، تحتاج لمراجعة 📚"; color = "text-yellow-600"; }
-            else { msg = "تحتاج لمزيد من التدريب في الأساسيات ⚠️"; color = "text-red-600"; }
+            // Update Navigation
+            prevBtn.disabled = index === 0;
+            if (index === questions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
 
-            document.getElementById('result-text').innerHTML = `
-                <div class="text-lg mb-2 ${color} font-bold">${msg}</div>
-                <div class="text-3xl text-gray-800">النتيجة: ${score} / ${quiz.questions.length}</div>
-            `;
-            
-            sendToTelegram(quiz.title, score, quiz.questions.length);
+            // Update Progress
+            const progress = ((index + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressPercent.textContent = `${Math.round(progress)}%`;
         }
 
-        function returnToDashboard() {
+        function selectAnswer(optionIndex) {
+            userAnswers[currentQuestion] = optionIndex;
+            loadQuestion(currentQuestion); // Re-render to show selection
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                loadQuestion(currentQuestion + 1);
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                loadQuestion(currentQuestion - 1);
+            }
+        }
+
+        function submitQuiz() {
             clearInterval(timerInterval);
-            quizActive = false;
-            document.getElementById('quiz-content').classList.add('hidden');
-            document.getElementById('timer-container').classList.add('hidden');
-            document.getElementById('timer-separator').classList.add('hidden');
-            document.getElementById('dashboard-screen').classList.remove('hidden');
+            quizInterface.classList.add('hidden');
+            timerContainer.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            calculateResults();
         }
 
-        async function sendToTelegram(title, score, total) {
-            if (TELEGRAM_BOT_TOKEN.includes("YOUR")) return;
-            try {
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID, parse_mode: 'Markdown',
-                        text: `📝 *نتيجة* | 👤 ${currentUser}\n📚 ${title}\n✅ ${score}/${total}\n⏱️ مدة الاختبار: ${quizDatabase[currentQuizId].duration}د`
-                    })
-                });
-            } catch(e) { console.error(e); }
+        function calculateResults() {
+            let score = 0;
+            const reviewSection = document.getElementById('review-section');
+            reviewSection.innerHTML = '<h3 class="text-xl font-bold text-slate-800 ml-2">تفاصيل الإجابات</h3>';
+
+            questions.forEach((q, index) => {
+                const isCorrect = userAnswers[index] === q.correct;
+                if (isCorrect) score++;
+
+                // Create Review Card
+                const card = document.createElement('div');
+                card.className = `glass-panel rounded-xl p-6 border-r-4 ${isCorrect ? 'border-green-500' : 'border-red-500'}`;
+                
+                let answerStatus = isCorrect 
+                    ? `<span class="text-green-600 font-bold"><i class="fa-solid fa-check-circle ml-2"></i>صحيح</span>` 
+                    : `<span class="text-red-600 font-bold"><i class="fa-solid fa-times-circle ml-2"></i>خطأ</span>`;
+
+                const userAnswerText = userAnswers[index] !== null ? q.options[userAnswers[index]] : "لا توجد إجابة";
+                const correctAnswerText = q.options[q.correct];
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="font-bold text-slate-800 text-lg">السؤال ${index + 1}</h4>
+                        ${answerStatus}
+                    </div>
+                    <p class="text-slate-700 mb-4">${q.text}</p>
+                    ${q.code ? `<div class="bg-slate-900 rounded p-3 mb-4 text-left" dir="ltr"><pre class="code-font text-xs text-slate-300 overflow-x-auto">${q.code}</pre></div>` : ''}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <span class="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">إجابتك</span>
+                            <span class="${isCorrect ? 'text-green-700 font-medium' : 'text-red-700 font-medium'}">${userAnswerText}</span>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded border border-green-200">
+                            <span class="text-green-800 block text-xs uppercase tracking-wider font-bold mb-1">الإجابة الصحيحة</span>
+                            <span class="text-green-800 font-bold">${correctAnswerText}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                        <p class="text-indigo-900 text-sm"><strong class="block mb-1"><i class="fa-solid fa-lightbulb text-yellow-500 ml-2"></i>الشرح:</strong>${q.explanation}</p>
+                    </div>
+                `;
+                reviewSection.appendChild(card);
+            });
+
+            // Update Score Display
+            const scoreDisplay = document.getElementById('score-display');
+            const scoreRing = document.getElementById('score-ring');
+            
+            // Animate number
+            let currentScore = 0;
+            const scoreInterval = setInterval(() => {
+                scoreDisplay.textContent = currentScore;
+                if (currentScore >= score) clearInterval(scoreInterval);
+                else currentScore++;
+            }, 100);
+
+            // Animate ring (Circumference is ~351.86)
+            const offset = 351.86 - (351.86 * (score / 10));
+            setTimeout(() => {
+                scoreRing.style.strokeDashoffset = offset;
+                // Color change based on score
+                if (score < 5) scoreRing.style.stroke = '#ef4444'; // Red
+                else if (score < 8) scoreRing.style.stroke = '#f59e0b'; // Orange
+                else scoreRing.style.stroke = '#22c55e'; // Green
+            }, 100);
         }
 
-        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
